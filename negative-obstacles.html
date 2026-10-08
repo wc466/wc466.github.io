@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Negative-Obstacle Detection — Weihao Cheng</title>
+  <meta name="description" content="Long-range LiDAR negative-obstacle detection: scan-line geometry, multi-frame ICP fusion and a cost-map detector, with interactive demos.">
+  <meta property="og:title" content="Negative-Obstacle Detection — Weihao Cheng">
+  <meta property="og:description" content="Interactive demos of LiDAR negative-obstacle detection, multi-frame ICP, ground segmentation and terrain mapping on off-road UGVs.">
+  <meta property="og:image" content="https://wc466.github.io/assets/img/og.png">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css?v=6">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="index.html">W<span>C</span></a>
+    <nav>
+      <a href="index.html#projects">← Projects</a>
+      <a href="#negobs">Problem</a>
+      <a href="#geometry">Geometry</a>
+      <a href="#icp">Fusion</a>
+      <a href="#detector">Detector</a>
+      <a href="#results">Results</a>
+    </nav>
+  </header>
+
+  <div class="crumb"><a href="index.html#projects">← All projects</a></div>
+  <!-- ============================================================ 01 NEGATIVE OBSTACLES: THE PROBLEM -->
+  <section class="project" id="negobs">
+    <div class="project-head">
+      <p class="tag mono">the problem</p>
+      <h2>Long-range negative-obstacle detection</h2>
+      <p class="summary">Trenches and pits are the most dangerous obstacles for an off-road vehicle, and the hardest to see.
+        The leading edge hides most of the hole, so a LiDAR gets <em>almost no</em> points from inside it. In my tests the
+        pits only became visible in raw point clouds about <b>3 m</b> away, which left our John Deere R-Gator about 2 m to react. The
+        sections below explain why that happens, how I enhanced the data, and the detector that pushed detection out to <b>8.5 m</b>.</p>
+    </div>
+    <div class="demo-grid even">
+      <figure class="fig" data-cap="Test pit: 0.35 m long, 0.2 m deep, 0.7 m wide (three pits side by side, 0.35–0.7 m wide)">
+        <img src="assets/img/project/neg_obstacle_photo.jpg" alt="Negative obstacle with dimensions" loading="lazy">
+        <figcaption><b>The test pits</b>three pits side by side: 0.35 m long × 0.2 m deep, 0.35–0.7 m wide</figcaption></figure>
+      <div class="side-stats">
+        <div class="stat"><span class="num">depth / width &gt; 0.25</span><span class="lbl">what makes a negative obstacle "deep": the test pits (0.2 m deep, 0.35–0.7 m wide) are 0.29–0.57, so most of each pit is hidden behind its leading edge</span></div>
+        <div class="stat"><span class="num">~3 m</span><span class="lbl">range at which the pits became visible in raw point clouds: ≈2 m of reaction distance before the front wheels</span></div>
+        <div class="stat"><span class="num">1 LiDAR</span><span class="lbl">the constraint: a single roof-mounted 360° Ouster OS1-128 on a −15° tilted mount, with no extra sensors</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ STEP 1: GEOMETRY -->
+  <section class="project" id="geometry">
+    <div class="project-head">
+      <p class="tag mono">step 1 — why pits hide</p>
+      <h2>The geometry of seeing (and not seeing) obstacles</h2>
+      <p class="summary">From a LiDAR scan-line model, the deepest part of the back wall that any beam can reach is
+        <b>d = H·W / R</b>: proportional to sensor height and pit width, inversely proportional to range. If d falls below the
+        terrain noise, no algorithm can detect the pit. This sets the detector's threshold and the best range we can hope for.
+        Drag the sliders to try it.</p>
+    </div>
+
+    <figure class="panel">
+      <div class="panel-bar">
+        <span class="mono">Side view · OS1-128 beams on a −15° tilted mount</span>
+        <span class="legend"><i style="--c:var(--accent)"></i>beam hits back wall <i style="--c:#9fb0c3"></i>ground hit
+          <i style="--c:var(--hazard)"></i>critical scan line</span>
+      </div>
+      <svg class="geo-svg" id="geo-svg" viewBox="0 0 1000 330" role="img" aria-label="LiDAR scan line model"></svg>
+      <div class="controls inline">
+        <label class="ctl"><span>sensor height H <b id="geo-H-v"></b></span><input type="range" id="geo-H" min="0.8" max="3" step="0.05" value="1.9"></label>
+        <label class="ctl"><span>pit width W <b id="geo-W-v"></b></span><input type="range" id="geo-W" min="0.2" max="1.5" step="0.05" value="0.7"></label>
+        <label class="ctl"><span>range to leading edge R <b id="geo-R-v"></b></span><input type="range" id="geo-R" min="2" max="20" step="0.1" value="8.5"></label>
+        <label class="ctl"><span>threshold depth d<sub>min</sub> <b id="geo-T-v"></b></span><input type="range" id="geo-T" min="0.05" max="0.4" step="0.01" value="0.15"></label>
+      </div>
+      <div class="results" style="margin-top:14px">
+        <div class="result"><b id="geo-d">—</b><span>max observed back-wall depth d = H·W/R</span></div>
+        <div class="result"><b id="geo-rmax">—</b><span>max detection range for this pit (d = d<sub>min</sub>)</span></div>
+        <div class="result"><b id="geo-hits">—</b><span>beams that land on the back wall (simulated, 0.33° spacing)</span></div>
+        <div class="result"><span id="geo-verdict" class="verdict">—</span><span style="display:block;margin-top:8px">
+          detectable if d ≥ d<sub>min</sub>. The project used d<sub>min</sub> = 0.15 m to sit above terrain noise.</span></div>
+      </div>
+      <p class="note" style="margin-top:12px">Sanity check: at the defaults (the R-Gator's H = 1.9 m and the 0.7 m test pit), the model predicts
+        detection out to 8.9 m. In the field, the detector first flagged that pit at about 8.5 m.</p>
+    </figure>
+
+    <h3 class="subhead">Positive obstacles fade too: a traffic cone at 25 m → 9 m</h3>
+    <p class="subnote">From a 90°-FOV drive toward a 28-inch (0.71 m) cone: ground removed with Patchwork, non-ground points
+      clustered (DBSCAN), and the cone tracked frame to frame. Its point count follows the angular-resolution model
+      n ≈ A / (R² · Δθ<sub>v</sub> · Δθ<sub>h</sub>), so it falls as 1/R².</p>
+    <figure class="panel" style="margin-top:14px">
+      <div class="cone-grid">
+        <svg class="geo-svg" id="cone-chart" viewBox="0 0 640 300" role="img" aria-label="Points on cone vs range"></svg>
+        <svg class="cone-front" id="cone-front" viewBox="-60 -10 120 100" preserveAspectRatio="xMidYMid meet" aria-label="Cone points, front view"></svg>
+      </div>
+      <div class="timeline">
+        <button class="icon-btn" id="cone-play" aria-label="Play">▶</button>
+        <input type="range" id="cone-slider" min="0" max="60" value="0" aria-label="Frame">
+        <span class="mono dim" id="cone-read" style="min-width:150px;text-align:right">—</span>
+      </div>
+      <figcaption>Left: measured points on the cone (dots) vs. the model with A = 0.15 m² silhouette, Δθ<sub>v</sub> = 0.33°, Δθ<sub>h</sub> = 360°/2048.
+        Closer than ~15 m the model over-predicts, because the bottom of the cone gets absorbed into the ground estimate. Right: the same cone, front view, at the selected range.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ============================================================ STEP 2: FUSION -->
+  <section class="project" id="icp">
+    <div class="project-head">
+      <p class="tag mono">step 2 — seeing more with the same sensor</p>
+      <h2>Multi-frame fusion with ICP + pose-graph optimization</h2>
+      <p class="summary">Ground resolution falls with range, so I fuse a sliding window of 5 scans. Each pair is aligned
+        with coarse-to-fine <b>point-to-plane ICP</b>. Consecutive pairs become odometry edges and the rest become
+        loop-closure edges, and a <b>Levenberg–Marquardt pose graph</b> solves for consistent poses. The trick that made it fast:
+        register on <b>1 m voxel-downsampled</b> clouds, then apply the transforms to the full-resolution scans.</p>
+    </div>
+
+    <div class="demo-grid wide-left">
+      <figure class="panel">
+        <div class="panel-bar">
+          <div class="seg" role="tablist" id="icp-runs"></div>
+          <span class="legend" id="icp-legend"></span>
+        </div>
+        <div class="viewer tall" id="icp-view"><div class="loading mono">loading 5 scans…</div></div>
+        <div class="timeline">
+          <button class="btn small primary" id="icp-run">Run ICP ▶</button>
+          <label class="mono dim" for="icp-slider">raw</label>
+          <input type="range" id="icp-slider" min="0" max="1000" value="0" aria-label="Registration blend">
+          <label class="mono dim" for="icp-slider">aligned</label>
+        </div>
+        <figcaption>Everything is expressed in the newest scan's frame. Unregistered, the five scans disagree by up to
+          <span id="icp-travel-cap">0.8 m</span>, which shows as a rainbow smear on the wall ahead. After ICP the older scans slide back
+          into place, and the dots behind the arrow trace where the vehicle has been.</figcaption>
+      </figure>
+
+      <div class="side-stats">
+        <div class="stat"><span class="num">3.5 s → 0.1 s</span><span class="lbl">to fuse 5 frames on a laptop, thanks to downsampled registration</span></div>
+        <div class="stat"><span class="num" id="stat-density">—</span><span class="lbl">more ground points in the detection region (2.75–9 m ahead) than the newest scan alone</span></div>
+        <div class="stat"><span class="num" id="stat-err">—</span><span class="lbl">mean per-scan error of ICP's forward motion vs. an independent estimate from the range to the wall ahead</span></div>
+        <div class="stat"><span class="num" id="stat-drift">—</span><span class="lbl">vehicle travel across this window</span></div>
+        <div class="bars" id="icp-bars"></div>
+      </div>
+    </div>
+
+    <div class="figs two">
+      <figure class="fig scan" data-cap="A single raw frame, 3–8 m ahead: the pits (yellow box) are barely outlined">
+        <img src="assets/img/project/raw_cloud.jpg" alt="Raw point cloud" loading="lazy">
+        <figcaption><b>Before: one raw frame</b>pits barely outlined, 0.12 m ground resolution at 8 m</figcaption></figure>
+      <figure class="fig scan" data-cap="After 5-frame ICP fusion: ground resolution at 8 m improves from 0.12 m to 0.04 m">
+        <img src="assets/img/project/fused_cloud.jpg" alt="Fused point cloud" loading="lazy">
+        <figcaption><b>After: 5-frame fused</b>pit outlines visible, 0.04 m ground resolution at 8 m</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- ============================================================ STEP 3: DETECTOR -->
+  <section class="project" id="detector">
+    <div class="project-head">
+      <p class="tag mono">step 3 — the detector</p>
+      <h2>From fused points to a 5 cm cost map</h2>
+      <p class="summary">The detector turns each fused cloud into a bird's-eye cost map by looking for the two signatures the
+        geometry predicts: the <b>elevation drop</b> on the pit's back wall, and the <b>empty, occluded cells</b> right in
+        front of it. Step through the stages, or play the drive as the vehicle approaches the pits.</p>
+    </div>
+
+    <div class="demo-grid">
+      <figure class="panel">
+        <div class="panel-bar">
+          <span class="mono">Cost map pipeline</span>
+          <span class="mono dim" id="cm-frames">frames —</span>
+        </div>
+        <div class="stage-tabs" id="stage-tabs" role="tablist"></div>
+        <div class="costmap-wrap">
+          <img id="cm-img" alt="Cost map stage" width="200" height="125">
+          <div class="axis-x mono">← +y (left) · · · −y (right) →</div>
+          <div class="axis-y mono">forward (x) 2.75 → 9 m</div>
+        </div>
+        <p class="stage-caption" id="stage-caption"></p>
+        <div class="timeline">
+          <button class="icon-btn" id="cm-play" aria-label="Play">▶</button>
+          <input type="range" id="cm-slider" min="0" max="41" value="16" aria-label="Frame window">
+        </div>
+        <svg class="spark" id="cm-spark" viewBox="0 0 420 46" preserveAspectRatio="none" aria-label="Flagged cells per window"></svg>
+        <p class="spark-label mono dim">flagged cells per window — click a bar; the pits enter range around frame 60</p>
+      </figure>
+
+      <figure class="panel">
+        <div class="panel-bar">
+          <span class="mono">Fused cloud · labelled by cost map</span>
+          <span class="legend"><i style="--c:var(--hazard)"></i>obstacle <i style="--c:#7d8ea3"></i>terrain</span>
+        </div>
+        <div class="viewer" id="negobs-view"><div class="loading mono">loading point cloud…</div></div>
+        <figcaption class="mono" id="negobs-cap">drag to orbit · scroll to zoom</figcaption>
+      </figure>
+    </div>
+
+    <div class="cols3">
+      <div class="card">
+        <h3>1 · Elevation disparity</h3>
+        <p>Mean height per 5 cm cell minus a terrain trend from a coarse grid with bicubic interpolation. Cells that
+          drop more than the threshold back-wall depth are low-elevation regions. This tolerates slopes but catches sharp dips.</p>
+      </div>
+      <div class="card">
+        <h3>2 · Occluded regions</h3>
+        <p>For each low-elevation cell, look up to 40 cm back toward the sensor. Empty cells in the density map there
+          are the shadow the leading edge casts. The two together mark the obstacle. This search is vectorised in NumPy.</p>
+      </div>
+      <div class="card">
+        <h3>3 · Clean-up &amp; GPU</h3>
+        <p>A 2×2 erosion drops isolated cells, then 2 dilation passes add a safety margin. After line-profiling, the
+          nearest-neighbour hole filling moved to a <span class="mono">Numba CUDA</span> kernel.</p>
+      </div>
+    </div>
+
+    <p class="note" style="margin-top:12px">The interactive demo re-runs the research code as committed (12 cm disparity threshold, 2 m coarse grid);
+      the project evaluation used 0.15 m and 1.5 m.</p>
+  </section>
+
+  <!-- ============================================================ RESULTS -->
+  <section class="project" id="results">
+    <div class="project-head">
+      <p class="tag mono">results</p>
+      <h2>Pits detected at 8.5 m instead of ~3 m</h2>
+      <p class="summary">Over 50 consecutive fused frames (5 s of driving), the detector produced a cost map in about 0.5 s
+        per frame on a laptop. The larger pits appear first and the smallest last, as the geometry predicts. The model gives
+        8.9 m for the 0.7 m pit, and the field result was ~8.5 m.</p>
+    </div>
+    <div class="results">
+      <div class="result"><b>8.5 m</b><span>detection distance for the 0.55–0.7 m-wide pits</span></div>
+      <div class="result"><b>6.5 m</b><span>robust detection for the smallest 0.35 m-wide pit</span></div>
+      <div class="result"><b>~3×</b><span>more reaction distance than raw point clouds (pits visible at ~3 m)</span></div>
+      <div class="result"><b>1 LiDAR</b><span>comparable to multi-LiDAR methods, using a single roof-mounted 360° sensor</span></div>
+    </div>
+    <div class="figs">
+      <figure class="fig contain" data-cap="Cost map as the vehicle approaches: the largest pit is detected first">
+        <img src="assets/img/project/costmap_1.jpg" alt="Cost map, one pit detected" loading="lazy"><figcaption><b>Approaching</b>largest pit flagged first</figcaption></figure>
+      <figure class="fig contain" data-cap="Cost map, closer: the two larger pits are detected">
+        <img src="assets/img/project/costmap_2.jpg" alt="Cost map, two pits detected" loading="lazy"><figcaption><b>Closer</b>both larger pits flagged</figcaption></figure>
+      <figure class="fig contain" data-cap="Cost map, closest: all three pits, including the 0.35 m-wide one, are detected">
+        <img src="assets/img/project/costmap_3.jpg" alt="Cost map, three pits detected" loading="lazy"><figcaption><b>Closest</b>all three pits, including 0.35 m</figcaption></figure>
+    </div>
+
+    <div class="cite-box">
+      <b>Paper &amp; citation.</b> This work is described in our manuscript with W. R. Norris, D. S. Nottage and A. Soylemezoglu,
+      who I thank for their guidance and support. If you reference or build on the method, the scan-line analysis or the results, please cite:
+      <pre>W. Cheng, W. R. Norris, D. S. Nottage, and A. Soylemezoglu, "An Elevation-based Deep Negative Obstacle
+Detection and Mapping Method for Unmanned Ground Vehicles with LiDAR Point Cloud Data," manuscript, 2024.</pre>
+    </div>
+
+    <h3 class="subhead" id="references">References &amp; credits</h3>
+    <ol class="refs">
+      <li>E. Shang, X. An, T. Wu, T. Hu, Q. Yuan, and H. He, “LiDAR based negative obstacle detection for field autonomous land vehicles,” <i>Journal of Field Robotics</i>, 33(5):591–617, 2016.</li>
+      <li>C. Goodin, J. Carrillo, J. G. Monroe, D. W. Carruth, and C. R. Hudson, “An analytic model for negative obstacle detection with lidar and numerical validation using physics-based simulation,” <i>Sensors</i>, 21(9):3211, 2021.</li>
+      <li>N. Heckman, J.-F. Lalonde, N. Vandapel, and M. Hebert, “Potential negative obstacle detection by occlusion labeling,” <i>IEEE/RSJ IROS</i>, 2007.</li>
+      <li>J. Larson and M. Trivedi, “Lidar based off-road negative obstacle detection and analysis,” <i>IEEE ITSC</i>, 2011.</li>
+      <li>Z. Zhong, Z. Wang, L. Lin, H. Liang, and F. Xu, “Robust negative obstacle detection in off-road environments using multiple LiDARs,” <i>ICCAR</i>, 2020.</li>
+      <li>Y. Chen and G. Medioni, “Object modelling by registration of multiple range images,” <i>Image and Vision Computing</i>, 10(3):145–155, 1992.</li>
+      <li>J. Park, Q.-Y. Zhou, and V. Koltun, “Colored point cloud registration revisited,” <i>IEEE ICCV</i>, 2017.</li>
+      <li>S. Rusinkiewicz and M. Levoy, “Efficient variants of the ICP algorithm,” <i>3DIM</i>, 2001.</li>
+      <li>Q.-Y. Zhou, J. Park, and V. Koltun, “Open3D: A modern library for 3D data processing,” arXiv:1801.09847, 2018.</li>
+      <li>H. Lim, M. Oh, and H. Myung, “Patchwork: Concentric zone-based region-wise ground segmentation with ground likelihood estimation using a 3D LiDAR sensor,” <i>IEEE RA-L</i>, 2021. Code: <a href="https://github.com/LimHyungTae/patchwork">github.com/LimHyungTae/patchwork</a>.</li>
+      <li>M. Ester, H.-P. Kriegel, J. Sander, and X. Xu, “A density-based algorithm for discovering clusters in large spatial databases with noise,” <i>KDD</i>, 1996.</li>
+    </ol>
+    <p class="note"><b>Hardware credits.</b> R-Gator: Deere &amp; Company (John Deere). OS1-128, OS2-64 LiDAR: Ouster. Product names and trademarks belong to their respective owners.</p>
+  </section>
+
+  <footer class="site-foot">
+    <p class="mono dim">© 2024–2026 Weihao Cheng. All rights reserved: text, figures, data and code on this site may not be reused without permission.</p>
+    <p class="mono dim">Interactive demos render the original research data in your browser with three.js. Hardware shown is made by
+      John Deere (R-Gator), Clearpath Robotics (Husky, Jackal, Warthog), Ouster and Velodyne (LiDAR), Carnegie Robotics and Intel (cameras);
+      trademarks belong to their owners.</p>
+  </footer>
+
+  <div class="lightbox" id="lightbox" hidden><img alt=""><p></p></div>
+  <script type="module" src="assets/js/main.js?v=6"></script>
+</body>
+</html>

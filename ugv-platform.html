@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Autonomous Off-Road Platform — Weihao Cheng</title>
+  <meta name="description" content="Turning a 6x4 utility vehicle into an autonomous research UGV, alongside Husky, Jackal and Warthog robots.">
+  <meta property="og:title" content="Autonomous Off-Road Platform — Weihao Cheng">
+  <meta property="og:description" content="Interactive demos of LiDAR negative-obstacle detection, multi-frame ICP, ground segmentation and terrain mapping on off-road UGVs.">
+  <meta property="og:image" content="https://wc466.github.io/assets/img/og.png">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css?v=6">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="index.html">W<span>C</span></a>
+    <nav>
+      <a href="index.html#projects">← Projects</a>
+      <a href="negative-obstacles.html">Negative obstacles</a>
+      <a href="ground-segmentation.html">Ground segmentation</a>
+    </nav>
+  </header>
+
+  <div class="crumb"><a href="index.html#projects">← All projects</a></div>
+  <section class="project">
+    <div class="project-head">
+      <p class="tag mono">platforms · integration</p>
+      <h2>Autonomous off-road platform</h2>
+      <p class="summary">Most of this work ran on a modified <b>John Deere R-Gator</b>, a 6×4 unmanned utility vehicle with strong off-road capability. It started as a bare-bones platform with no localization or perception, and I helped turn it into a research vehicle: sensor mount, calibrated LiDAR and stereo, EKF odometry, and ROS2 integration. I also worked across a fleet of Clearpath Robotics platforms (Husky, Jackal, Warthog).</p>
+    </div>
+    <div class="status-banner"><span class="wip-badge">Results in progress</span><span>The platform is operational and was used for every dataset on this site. A full integration write-up (architecture, networking, ROS2 graph) is coming.</span></div>
+    <div class="figs two">
+      <figure class="fig" data-cap="Modified John Deere R-Gator: a 6×4 off-road utility vehicle made autonomous">
+        <img src="assets/img/project/rgator.jpg" alt="Modified R-Gator" loading="lazy"><figcaption><b>Modified R-Gator</b>6×4 off-road UGV</figcaption></figure>
+      <figure class="fig" data-cap="Autonomous platforms: John Deere R-Gator, Clearpath Warthog, Jackal and Husky">
+        <img src="assets/img/project/platforms.jpg" alt="The fleet" loading="lazy"><figcaption><b>The fleet</b>R-Gator · Warthog · Jackal · Husky</figcaption></figure>
+    </div>
+    <div class="cols3">
+      <div class="card"><h3>R-Gator &amp; Warthog</h3><p>Large platforms for unmanned transport and construction tasks in
+        rough terrain. They carry the OS1-128 + MultiSense S27 perception head.</p></div>
+      <div class="card"><h3>Husky &amp; Jackal</h3><p>Smaller Clearpath robots for surveillance and prototyping. New
+        perception and mapping stacks were tried here before going on the big vehicles.</p></div>
+      <div class="card"><h3>Software</h3><p>ROS1 (Melodic, Noetic) and ROS2 (Humble), with Docker to run ROS1-only packages
+        next to ROS2 nodes. See <a href="sensing-stack.html">sensing stack</a> and <a href="terrain-mapping.html">terrain mapping</a>.</p></div>
+    </div>
+
+    <h3 class="subhead" id="references">References &amp; credits</h3>
+    <ol class="refs">
+      <li>S. Macenski, T. Foote, B. Gerkey, C. Lalancette, and W. Woodall, “Robot Operating System 2: Design, architecture, and uses in the wild,” <i>Science Robotics</i>, 7(66), 2022.</li>
+    </ol>
+    <p class="note"><b>Hardware credits.</b> R-Gator: Deere &amp; Company (John Deere). Husky, Jackal, Warthog: Clearpath Robotics. OS1-128, OS2-64 LiDAR: Ouster. MultiSense S27 stereo camera: Carnegie Robotics. Product names and trademarks belong to their respective owners.</p>
+  </section>
+
+  <footer class="site-foot">
+    <p class="mono dim">© 2024–2026 Weihao Cheng. All rights reserved: text, figures, data and code on this site may not be reused without permission.</p>
+    <p class="mono dim">Interactive demos render the original research data in your browser with three.js. Hardware shown is made by
+      John Deere (R-Gator), Clearpath Robotics (Husky, Jackal, Warthog), Ouster and Velodyne (LiDAR), Carnegie Robotics and Intel (cameras);
+      trademarks belong to their owners.</p>
+  </footer>
+
+  <div class="lightbox" id="lightbox" hidden><img alt=""><p></p></div>
+  <script type="module" src="assets/js/main.js?v=6"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Weihao Cheng — Robotics Perception</title>
+  <meta name="description" content="Weihao Cheng — perception and mapping for unmanned ground vehicles: negative-obstacle detection, ground segmentation, terrain mapping.">
+  <meta property="og:title" content="Weihao Cheng — Robotics Perception">
+  <meta property="og:description" content="Interactive demos of LiDAR negative-obstacle detection, multi-frame ICP, ground segmentation and terrain mapping on off-road UGVs.">
+  <meta property="og:image" content="https://wc466.github.io/assets/img/og.png">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css?v=6">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="index.html">W<span>C</span></a>
+    <nav>
+      <a href="#projects">Projects</a>
+      <a href="negative-obstacles.html">Negative obstacles</a>
+      <a href="ground-segmentation.html">Ground segmentation</a>
+      <a href="mailto:wcheng466@gmail.com">Contact</a>
+    </nav>
+  </header>
+
+  <!-- ============================================================ HERO -->
+  <section class="hero" id="top">
+    <div class="hero-canvas" id="hero-view" aria-hidden="true"></div>
+    <div class="hero-text">
+      <p class="eyebrow mono">// perception &amp; mapping for unmanned ground vehicles</p>
+      <h1>Weihao Cheng</h1>
+      <p class="role">Robotics perception engineer · M.S. Mechanical Engineering</p>
+      <p class="lede">I build LiDAR perception for off-road autonomous vehicles — registering scans, segmenting
+        ground, mapping terrain, and finding the trenches and pits a robot should never drive into.</p>
+      <div class="cta">
+        <a class="btn primary" href="#projects">See projects ↓</a>
+        <a class="btn" href="mailto:wcheng466@gmail.com">Email</a>
+        <a class="btn" href="https://www.linkedin.com/" target="_blank" rel="noopener" data-todo="linkedin">LinkedIn</a>
+      </div>
+      <p class="hint mono">Background: one raw Ouster OS1-128 scan from the R-Gator — drag to orbit.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ ABOUT -->
+  <section class="about">
+    <div class="about-card">
+      <div>
+        <p class="tag mono">Graduate research project · 2024</p>
+        <h2>Perception and Mapping for Unmanned Ground Vehicles in Unstructured Environments</h2>
+        <p>Graduate research supported by the US Army Construction Engineering Research Laboratory (CERL):
+          ground segmentation, long-range deep negative-obstacle detection, and multi-modal traversability mapping,
+          tested on four autonomous platforms. Everything below runs on the data I collected.</p>
+      </div>
+      <div class="facts">
+        <div class="fact"><b>8.5 m</b>detection range for a 0.7 m-wide pit (vs ~3 m before)</div>
+        <div class="fact"><b>35× faster</b>5-frame fusion: 3.5 s → 0.1 s</div>
+        <div class="fact"><b>4 robots</b>R-Gator · Warthog · Husky · Jackal</div>
+        <div class="fact"><b>ROS1 + ROS2</b>Melodic, Noetic, Humble, Docker bridges</div>
+      </div>
+    </div>
+  </section>
+  <div class="strip">
+    <span class="chip">Python · NumPy · SciPy</span><span class="chip">Open3D · PCL</span><span class="chip">C++</span>
+    <span class="chip">CUDA (Numba / CuPy)</span><span class="chip">ROS / ROS2</span><span class="chip">ICP · pose graphs</span>
+    <span class="chip">EKF localization</span><span class="chip">LiDAR–camera calibration</span><span class="chip">YOLOv8</span>
+    <span class="chip">Docker</span>
+  </div>
+
+  <!-- ============================================================ PROJECTS -->
+  <section class="project" id="projects">
+    <div class="project-head">
+      <p class="tag mono">projects</p>
+      <h2>Selected work</h2>
+    </div>
+    <div class="proj-grid">
+      <a class="proj-card" href="negative-obstacles.html">
+        <div class="proj-thumb"><img src="assets/img/project/neg_obstacle_photo.jpg" alt="" loading="lazy"></div>
+        <div class="proj-body"><h3>Long-range negative-obstacle detection</h3><p>Seeing trenches and pits at 8.5 m instead of ~3 m with one roof-mounted LiDAR: scan-line geometry, multi-frame ICP fusion and a 5 cm elevation/occlusion cost map.</p><div class="proj-tags"><span class="chip">LiDAR</span><span class="chip">ICP</span><span class="chip">CUDA</span><span class="chip">interactive demos</span></div>
+          <span class="proj-cta">View project →</span></div>
+      </a>
+      <a class="proj-card" href="ground-segmentation.html">
+        <div class="proj-thumb"><img src="assets/img/project/patchwork_patches.jpg" alt="" loading="lazy"></div>
+        <div class="proj-body"><h3>Ground segmentation for off-road terrain</h3><p>Patchwork, Patchwork++, GndNet and SqueezeSegV3 on an outdoor dataset I collected, plus a live in-browser concentric-zone segmenter and Patchwork running on the R-Gator.</p><div class="proj-tags"><span class="chip">Patchwork</span><span class="chip">GndNet</span><span class="chip">ROS</span><span class="chip">interactive demos</span></div>
+          <span class="proj-cta">View project →</span></div>
+      </a>
+      <a class="proj-card wip" href="sensing-stack.html">
+        <div class="proj-thumb"><img src="assets/img/project/fusion_rgator.jpg" alt="" loading="lazy"><span class="wip-badge">Results in progress</span></div>
+        <div class="proj-body"><h3>Sensing stack: calibration, fusion & localization</h3><p>Tilted sensor mount, LiDAR–stereo calibration through URDF/TF, and EKF odometry (IMU + wheel encoders) on ROS2.</p><div class="proj-tags"><span class="chip">ROS2</span><span class="chip">EKF</span><span class="chip">calibration</span></div>
+          <span class="proj-cta">View details →</span></div>
+      </a>
+      <a class="proj-card wip" href="terrain-mapping.html">
+        <div class="proj-thumb"><img src="assets/img/project/elevation_husky.jpg" alt="" loading="lazy"><span class="wip-badge">Results in progress</span></div>
+        <div class="proj-body"><h3>Terrain traversability mapping</h3><p>2.5D elevation, 3D voxel and GPU multi-layer elevation maps across three robots, bridged ROS1↔ROS2 with Docker.</p><div class="proj-tags"><span class="chip">elevation mapping</span><span class="chip">GPU</span><span class="chip">Docker</span></div>
+          <span class="proj-cta">View details →</span></div>
+      </a>
+      <a class="proj-card wip" href="pothole-detection.html">
+        <div class="proj-thumb"><img src="assets/img/project/pothole_large.jpg" alt="" loading="lazy"><span class="wip-badge">Results in progress</span></div>
+        <div class="proj-body"><h3>Vision-based pothole detection</h3><p>Custom-trained YOLOv8 segmentation as a camera-based pilot study for negative obstacles.</p><div class="proj-tags"><span class="chip">YOLOv8</span><span class="chip">segmentation</span></div>
+          <span class="proj-cta">View details →</span></div>
+      </a>
+      <a class="proj-card wip" href="ugv-platform.html">
+        <div class="proj-thumb"><img src="assets/img/project/rgator.jpg" alt="" loading="lazy"><span class="wip-badge">Results in progress</span></div>
+        <div class="proj-body"><h3>Autonomous off-road platform</h3><p>Turning a 6×4 John Deere R-Gator into an autonomous research vehicle, alongside Husky, Jackal and Warthog.</p><div class="proj-tags"><span class="chip">UGV</span><span class="chip">integration</span></div>
+          <span class="proj-cta">View details →</span></div>
+      </a>
+    </div>
+  </section>
+
+  <footer class="site-foot">
+    <p class="mono dim">© 2024–2026 Weihao Cheng. All rights reserved: text, figures, data and code on this site may not be reused without permission.</p>
+    <p class="mono dim">Interactive demos render the original research data in your browser with three.js. Hardware shown is made by
+      John Deere (R-Gator), Clearpath Robotics (Husky, Jackal, Warthog), Ouster and Velodyne (LiDAR), Carnegie Robotics and Intel (cameras);
+      trademarks belong to their owners.</p>
+  </footer>
+
+  <div class="lightbox" id="lightbox" hidden><img alt=""><p></p></div>
+  <script type="module" src="assets/js/main.js?v=6"></script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ground Segmentation — Weihao Cheng</title>
+  <meta name="description" content="Ground segmentation for off-road LiDAR: learned vs geometric methods, a live in-browser segmenter, and Patchwork on a UGV.">
+  <meta property="og:title" content="Ground Segmentation — Weihao Cheng">
+  <meta property="og:description" content="Interactive demos of LiDAR negative-obstacle detection, multi-frame ICP, ground segmentation and terrain mapping on off-road UGVs.">
+  <meta property="og:image" content="https://wc466.github.io/assets/img/og.png">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css?v=6">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="index.html">W<span>C</span></a>
+    <nav>
+      <a href="index.html#projects">← Projects</a>
+      <a href="#ground">Comparison</a>
+      <a href="#patchwork">Live demo</a>
+      <a href="#pwros">On the vehicle</a>
+    </nav>
+  </header>
+
+  <div class="crumb"><a href="index.html#projects">← All projects</a></div>
+  <!-- ============================================================ 02 GROUND -->
+  <section class="project" id="ground">
+    <div class="project-head">
+      <p class="tag mono">CS 543 final project</p>
+      <h2>Ground segmentation for off-road terrain</h2>
+      <p class="summary">I collected a 1,500-frame, on- and off-road LiDAR dataset (Ouster OS1-128) on a John Deere R-Gator at an outdoor test
+        course, then ran two geometric methods (<b>Patchwork</b>, <b>Patchwork++</b>) and two learned networks
+        (<b>GndNet</b>, <b>SqueezeSegV3</b>, with its 20 classes collapsed to ground/non-ground) on frame 800. Below:
+        the two networks on that frame, and where they disagree. GndNet absorbs the bottom rows of the building wall into the ground.</p>
+    </div>
+
+    <div class="demo-grid wide-left">
+      <figure class="panel">
+        <div class="panel-bar">
+          <div class="seg" role="tablist" id="ground-toggle">
+            <button class="on" data-k="v3">SqueezeSegV3</button>
+            <button data-k="gndnet">GndNet</button>
+            <button data-k="diff">Disagreement</button>
+          </div>
+          <span class="legend" id="ground-legend"></span>
+        </div>
+        <div class="viewer tall" id="ground-view"><div class="loading mono">loading scan…</div></div>
+        <figcaption>Frame 800 of the outdoor dataset. GndNet's output was written in a different frame, so I re-registered it to SqueezeSegV3's (9 cm RMSE).</figcaption>
+      </figure>
+      <div class="side-stats">
+        <div class="stat"><span class="num" id="g-1">—</span><span class="lbl" id="g-1l">points labelled ground</span></div>
+        <div class="stat"><span class="num" id="g-2">—</span><span class="lbl" id="g-2l">points labelled non-ground</span></div>
+        <div class="stat"><span class="num" id="g-3">—</span><span class="lbl" id="g-3l">ground share of the scan</span></div>
+        <p class="note">The dataset is unlabeled, so the comparison is qualitative; all four methods segmented 100k+ point
+          frames in both on- and off-road conditions.</p>
+      </div>
+    </div>
+
+    <div class="figs four">
+      <figure class="fig" data-cap="Outdoor test course: on-road pavement and off-road grass">
+        <img src="assets/img/project/test_course.jpg" alt="Outdoor test course" loading="lazy"><figcaption><b>Outdoor test course</b>1,500+ frames, on- and off-road</figcaption></figure>
+      <figure class="fig" data-cap="Patchwork's concentric patches in RViz (green: ground patches, red: non-ground patches)">
+        <img src="assets/img/project/patchwork_patches.jpg" alt="Patchwork concentric patches" loading="lazy"><figcaption><b>Patchwork patches</b>concentric zone model in RViz</figcaption></figure>
+      <figure class="fig" data-cap="Patchwork result on frame 800 (green: ground, red: non-ground)">
+        <img src="assets/img/project/patchwork.jpg" alt="Patchwork result" loading="lazy"><figcaption><b>Patchwork</b>frame 800</figcaption></figure>
+      <figure class="fig" data-cap="Patchwork++ result on frame 800 (green: ground, red: non-ground)">
+        <img src="assets/img/project/patchworkpp.jpg" alt="Patchwork++ result" loading="lazy"><figcaption><b>Patchwork++</b>frame 800</figcaption></figure>
+    </div>
+
+    <h3 class="subhead" id="patchwork">Live: concentric-zone ground fitting in your browser</h3>
+    <p class="subnote">A single ground plane can't fit real terrain, so Patchwork-style methods split the scan into rings and
+      sectors and fit a small PCA plane in each bin. Seeding each plane from its lowest points stops walls and bushes from
+      dragging it upward. Every change re-segments all 72,818 points of an off-road scan from scratch.</p>
+    <div class="demo-grid wide-left" style="margin-top:14px">
+      <figure class="panel">
+        <div class="panel-bar">
+          <div class="seg" id="pw-presets"></div>
+          <span class="legend"><i style="--c:var(--ground)"></i>ground <i style="--c:var(--nonground)"></i>non-ground</span>
+        </div>
+        <div class="viewer tall" id="pw-view"><div class="loading mono">loading scan…</div></div>
+        <figcaption>Off-road frame 66 · grid lines show the ring/sector bins · drag to orbit</figcaption>
+      </figure>
+      <div class="side-stats">
+        <div class="controls">
+          <label class="ctl"><span>rings <b id="pw-rings-v"></b></span><input type="range" id="pw-rings" min="1" max="20" step="1"></label>
+          <label class="ctl"><span>sectors per ring <b id="pw-sectors-v"></b></span><input type="range" id="pw-sectors" min="1" max="32" step="1"></label>
+          <label class="ctl"><span>distance threshold <b id="pw-thr-v"></b></span><input type="range" id="pw-thr" min="0.03" max="0.5" step="0.01"></label>
+          <label class="ctl check"><input type="checkbox" id="pw-seeded"> <span>lowest-point seeds + 3 refinement passes + uprightness check</span></label>
+        </div>
+        <div class="stat"><span class="num" id="pw-share">—</span><span class="lbl">of points labelled ground</span></div>
+        <div class="stat"><span class="num" id="pw-low">—</span><span class="lbl">of low points (within 30 cm of ground height) recovered. A rough check, not ground truth.</span></div>
+        <div class="stat"><span class="num" id="pw-ms">—</span><span class="lbl">to segment the scan in JavaScript (<span id="pw-bins">—</span> plane fits)</span></div>
+      </div>
+    </div>
+
+    <h3 class="subhead" id="pwros">Patchwork on the R-Gator (catkin / ROS)</h3>
+    <p class="subnote">I adapted the C++ Patchwork node to the tilted OS1-128: 1.8 m sensor height, 15° mount pitch, auto
+      height estimation off, and a custom loader for our recordings. Each bin gets a verdict:
+      <span class="st st0">upright</span> planes become ground, while <span class="st st3">too tilted</span> and
+      <span class="st st2">too high</span> patches are rejected. Scrub through the drive toward the pits.</p>
+    <div class="demo-grid wide-left" style="margin-top:14px">
+      <figure class="panel">
+        <div class="panel-bar">
+          <span class="mono" id="pwros-frame">frame —</span>
+          <label class="mono dim toggle"><input type="checkbox" id="pwros-patches" checked> patch verdicts</label>
+        </div>
+        <div class="viewer tall" id="pwros-view"><div class="loading mono">loading…</div></div>
+        <div class="timeline">
+          <button class="icon-btn" id="pwros-play" aria-label="Play">▶</button>
+          <input type="range" id="pwros-slider" min="0" max="12" value="0" aria-label="Frame">
+        </div>
+        <figcaption>Re-run offline with a Python port of <code>PatchWork::estimate_ground()</code> and the vehicle's <code>params_ouster128.yaml</code>.</figcaption>
+      </figure>
+      <div class="side-stats">
+        <div class="stat"><span class="num" id="pwros-share">—</span><span class="lbl">of in-range points labelled ground this frame</span></div>
+        <div class="stat"><span class="num" id="pwros-up">—</span><span class="lbl">patches accepted as upright ground planes</span></div>
+        <div class="stat"><span class="num" id="pwros-tilt">—</span><span class="lbl">patches rejected as too tilted (walls, vegetation)</span></div>
+        <p class="note">Zones: 2 / 4 / 4 / 4 rings × 16 / 32 / 54 / 32 sectors from 2.7 m to 80 m. Seeds come from the 20
+          lowest points per bin, followed by 3 rounds of PCA refitting with a 12.5 cm threshold.</p>
+      </div>
+    </div>
+
+    <h3 class="subhead" id="references">References &amp; credits</h3>
+    <ol class="refs">
+      <li>H. Lim, M. Oh, and H. Myung, “Patchwork: Concentric zone-based region-wise ground segmentation with ground likelihood estimation using a 3D LiDAR sensor,” <i>IEEE RA-L</i>, 2021. Code: <a href="https://github.com/LimHyungTae/patchwork">github.com/LimHyungTae/patchwork</a>.</li>
+      <li>S. Lee, H. Lim, and H. Myung, “Patchwork++: Fast and robust ground segmentation solving partial under-segmentation using 3D point cloud,” <i>IEEE/RSJ IROS</i>, 2022.</li>
+      <li>A. Paigwar, Ö. Erkent, D. S. González, and C. Laugier, “GndNet: Fast ground plane estimation and point cloud segmentation for autonomous vehicles,” <i>IEEE/RSJ IROS</i>, 2020.</li>
+      <li>C. Xu, B. Wu, Z. Wang, et al., “SqueezeSegV3: Spatially-adaptive convolution for efficient point-cloud segmentation,” <i>ECCV</i>, 2020.</li>
+      <li>C. R. Qi, H. Su, K. Mo, and L. J. Guibas, “PointNet: Deep learning on point sets for 3D classification and segmentation,” <i>CVPR</i>, 2017.</li>
+      <li>Q.-Y. Zhou, J. Park, and V. Koltun, “Open3D: A modern library for 3D data processing,” arXiv:1801.09847, 2018.</li>
+    </ol>
+    <p class="note"><b>Hardware credits.</b> R-Gator: Deere &amp; Company (John Deere). OS1-128, OS2-64 LiDAR: Ouster. Product names and trademarks belong to their respective owners.</p>
+  </section>
+
+  <footer class="site-foot">
+    <p class="mono dim">© 2024–2026 Weihao Cheng. All rights reserved: text, figures, data and code on this site may not be reused without permission.</p>
+    <p class="mono dim">Interactive demos render the original research data in your browser with three.js. Hardware shown is made by
+      John Deere (R-Gator), Clearpath Robotics (Husky, Jackal, Warthog), Ouster and Velodyne (LiDAR), Carnegie Robotics and Intel (cameras);
+      trademarks belong to their owners.</p>
+  </footer>
+
+  <div class="lightbox" id="lightbox" hidden><img alt=""><p></p></div>
+  <script type="module" src="assets/js/main.js?v=6"></script>
+</body>
+</html>

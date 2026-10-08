@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sensing Stack — Weihao Cheng</title>
+  <meta name="description" content="Tilted sensor mount, LiDAR–stereo calibration and fusion, and EKF localization for off-road UGVs.">
+  <meta property="og:title" content="Sensing Stack — Weihao Cheng">
+  <meta property="og:description" content="Interactive demos of LiDAR negative-obstacle detection, multi-frame ICP, ground segmentation and terrain mapping on off-road UGVs.">
+  <meta property="og:image" content="https://wc466.github.io/assets/img/og.png">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css?v=6">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="index.html">W<span>C</span></a>
+    <nav>
+      <a href="index.html#projects">← Projects</a>
+      <a href="negative-obstacles.html">Negative obstacles</a>
+      <a href="ground-segmentation.html">Ground segmentation</a>
+    </nav>
+  </header>
+
+  <div class="crumb"><a href="index.html#projects">← All projects</a></div>
+  <section class="project">
+    <div class="project-head">
+      <p class="tag mono">hardware · calibration · localization</p>
+      <h2>Sensing stack: calibration, fusion &amp; localization</h2>
+      <p class="summary">Perception starts with hardware. I designed a <b>−15° tilted sensor mount</b> for a John Deere R-Gator, calibrated and fused LiDAR and stereo cameras on two robots, and built the R-Gator's <b>odometry</b> from an IMU and wheel encoders so detections could be placed in a map.</p>
+    </div>
+    <div class="status-banner"><span class="wip-badge">Results in progress</span><span>The mount, calibration and odometry are deployed. A quantitative evaluation of calibration accuracy and odometry drift is still being written up.</span></div>
+    <div class="cols3">
+      <div class="card"><h3>Tilted sensor mount</h3><p>The OS1-128's vertical field of view is only ±22.5°, so a level LiDAR
+        leaves a large blind region in front of the vehicle. Mounting the LiDAR and a MultiSense S27 on the roll bar at −15°
+        cuts the blind region to <b>1.5 m</b> from the front axle, which is critical for seeing the ground and negative obstacles.</p></div>
+      <div class="card"><h3>LiDAR–camera calibration &amp; fusion</h3><p>Every sensor frame was modelled in the vehicle's URDF
+        from measured positions and orientations, and transforms were handled with TF in ROS and ROS2. On the R-Gator the stereo
+        camera's point cloud is fused with the LiDAR (ROS2 Humble); the Husky got the same treatment.</p></div>
+      <div class="card"><h3>EKF localization</h3><p>The stock R-Gator had no localization. I fused a high-precision
+        VectorNav VN-310 IMU with wheel encoders in an extended Kalman filter (<code>robot_localization</code>, ROS2 Humble,
+        Python) and passed the odometry to the mapping modules so obstacles stay put as the vehicle moves.</p></div>
+    </div>
+    <div class="figs">
+      <figure class="fig contain" data-cap="Tilted mount on the roll bar: Ouster OS1-128 above a MultiSense S27 stereo camera">
+        <img src="assets/img/project/sensor_mount.jpg" alt="Tilted sensor mount" loading="lazy"><figcaption><b>Tilted sensor mount</b>Ouster OS1-128 + MultiSense S27 at −15°</figcaption></figure>
+      <figure class="fig" data-cap="Calibrated LiDAR and stereo-camera point clouds fused on the R-Gator (RViz2, ROS2 Humble)">
+        <img src="assets/img/project/fusion_rgator.jpg" alt="LiDAR–stereo fusion" loading="lazy"><figcaption><b>LiDAR–stereo fusion</b>R-Gator, RViz2 / ROS2 Humble</figcaption></figure>
+      <figure class="fig" data-cap="Husky URDF with all sensor frames, and the transformed LiDAR point cloud (RViz2)">
+        <img src="assets/img/project/husky_tf.jpg" alt="Husky calibration" loading="lazy"><figcaption><b>Husky calibration</b>URDF frames + transformed LiDAR</figcaption></figure>
+    </div>
+    <h3 class="subhead">Sensors used</h3>
+    <ul class="list">
+      <li><b>Ouster OS1-128</b> (R-Gator, Clearpath Husky): 128 channels, 45° vertical FOV, 10 Hz. The main sensor for ground segmentation and negative obstacles.</li>
+      <li><b>Ouster OS2-64</b> (Husky): long-range, 64 channels.</li>
+      <li><b>Velodyne VLP-16</b> (Clearpath Jackal): lightweight 16-channel; too sparse on the ground for terrain classification.</li>
+      <li><b>Carnegie Robotics MultiSense S27</b> (R-Gator, Husky): rugged stereo, effective range up to 30 m.</li>
+      <li><b>Intel RealSense D435i</b> (Jackal): compact RGB-D, best within ~3 m and not built for sand and water.</li>
+      <li><b>VectorNav VN-310</b> GNSS/INS (R-Gator) to keep odometry drift low.</li>
+    </ul>
+
+    <h3 class="subhead" id="references">References &amp; credits</h3>
+    <ol class="refs">
+      <li>T. Moore and D. Stouch, “A generalized extended Kalman filter implementation for the Robot Operating System,” <i>Intelligent Autonomous Systems 13</i>, 2014.</li>
+      <li>S. Macenski, T. Foote, B. Gerkey, C. Lalancette, and W. Woodall, “Robot Operating System 2: Design, architecture, and uses in the wild,” <i>Science Robotics</i>, 7(66), 2022.</li>
+    </ol>
+    <p class="note"><b>Hardware credits.</b> R-Gator: Deere &amp; Company (John Deere). Husky, Jackal, Warthog: Clearpath Robotics. OS1-128, OS2-64 LiDAR: Ouster. VLP-16 LiDAR: Velodyne Lidar. MultiSense S27 stereo camera: Carnegie Robotics. RealSense D435i: Intel. VN-310 GNSS/INS: VectorNav Technologies. Product names and trademarks belong to their respective owners.</p>
+  </section>
+
+  <footer class="site-foot">
+    <p class="mono dim">© 2024–2026 Weihao Cheng. All rights reserved: text, figures, data and code on this site may not be reused without permission.</p>
+    <p class="mono dim">Interactive demos render the original research data in your browser with three.js. Hardware shown is made by
+      John Deere (R-Gator), Clearpath Robotics (Husky, Jackal, Warthog), Ouster and Velodyne (LiDAR), Carnegie Robotics and Intel (cameras);
+      trademarks belong to their owners.</p>
+  </footer>
+
+  <div class="lightbox" id="lightbox" hidden><img alt=""><p></p></div>
+  <script type="module" src="assets/js/main.js?v=6"></script>
+</body>
+</html>

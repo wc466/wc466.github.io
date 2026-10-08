@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Terrain Traversability Mapping — Weihao Cheng</title>
+  <meta name="description" content="2.5D elevation, 3D voxel and GPU multi-layer elevation maps for UGVs, bridged between ROS1 and ROS2 with Docker.">
+  <meta property="og:title" content="Terrain Traversability Mapping — Weihao Cheng">
+  <meta property="og:description" content="Interactive demos of LiDAR negative-obstacle detection, multi-frame ICP, ground segmentation and terrain mapping on off-road UGVs.">
+  <meta property="og:image" content="https://wc466.github.io/assets/img/og.png">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css?v=6">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="index.html">W<span>C</span></a>
+    <nav>
+      <a href="index.html#projects">← Projects</a>
+      <a href="negative-obstacles.html">Negative obstacles</a>
+      <a href="ground-segmentation.html">Ground segmentation</a>
+    </nav>
+  </header>
+
+  <div class="crumb"><a href="index.html#projects">← All projects</a></div>
+  <section class="project">
+    <div class="project-head">
+      <p class="tag mono">terrain traversability mapping</p>
+      <h2>From detections to traversability maps</h2>
+      <p class="summary">A UGV needs one map that combines terrain shape, terrain type and obstacles. I deployed vehicle-centric <b>2.5D elevation maps</b> and <b>3D voxel maps</b> on different robots, compared them, then set up a <b>GPU multi-layer elevation map</b> that fuses LiDAR geometry with camera information.</p>
+    </div>
+    <div class="status-banner"><span class="wip-badge">Results in progress</span><span>The mapping pipelines run on the robots. Next comes adding the negative-obstacle cost map and terrain classes as extra layers, and evaluating the results outdoors.</span></div>
+    <div class="cols3">
+      <div class="card"><h3>2.5D elevation map · Jackal</h3><p>Pilot study on a Clearpath Jackal (ROS1 Melodic): a Velodyne VLP-16 and an Intel RealSense D435i
+        fused into a grid of cell heights, using Clearpath's IMU + wheel odometry.</p></div>
+      <div class="card"><h3>3D voxel map · R-Gator</h3><p>OctoMap-style voxel map on a John Deere R-Gator (ROS2 Humble) from an Ouster OS1-128, using my custom EKF
+        odometry. It stores overhangs, but costs more memory and compute, which matters little outdoors.</p></div>
+      <div class="card"><h3>GPU multi-layer map · Husky</h3><p>On a Clearpath Husky, a GPU multi-modal elevation-mapping package (MEM) builds a 2.5D map with extra layers
+        (traversability, texture, terrain class). It only supports ROS1, so I ran it in <b>Docker</b> with ROS1↔ROS2 bridges into a
+        ROS2 Humble system.</p></div>
+    </div>
+    <div class="figs four">
+      <figure class="fig" data-cap="2.5D elevation map on the Clearpath Jackal (VLP-16 + RealSense D435i, ROS1 Melodic)">
+        <img src="assets/img/project/elevation_jackal.jpg" alt="2.5D elevation" loading="lazy"><figcaption><b>2.5D elevation</b>Jackal · ROS1 Melodic</figcaption></figure>
+      <figure class="fig" data-cap="3D voxel (octree) map on the R-Gator, coloured by height (ROS2 Humble)">
+        <img src="assets/img/project/voxel_rgator.jpg" alt="3D voxel map" loading="lazy"><figcaption><b>3D voxel map</b>R-Gator · ROS2 Humble</figcaption></figure>
+      <figure class="fig" data-cap="Multi-layer elevation map with traversability (green = traversable)">
+        <img src="assets/img/project/multilayer_map.jpg" alt="Multi-layer map" loading="lazy"><figcaption><b>Multi-layer map</b>elevation + traversability (green)</figcaption></figure>
+      <figure class="fig" data-cap="GPU elevation map running on the Husky through Docker ROS1↔ROS2 bridges (noisy indoor test data)">
+        <img src="assets/img/project/elevation_husky.jpg" alt="GPU elevation map" loading="lazy"><figcaption><b>GPU elevation map</b>Husky · Docker ROS1↔ROS2</figcaption></figure>
+    </div>
+    <h3 class="subhead">Takeaways so far</h3>
+    <ul class="list">
+      <li>For large outdoor areas, <b>2.5D maps</b> beat 3D voxels on compute for the same traversability decisions.</li>
+      <li>Most elevation maps leave <b>occluded cells empty</b>, which is exactly where deep negative obstacles hide. That gap is
+        why the <a href="negative-obstacles.html">negative-obstacle cost map</a> should become its own layer.</li>
+      <li>Camera layers (texture and terrain class) complement LiDAR geometry, for example for grass versus gravel.</li>
+    </ul>
+
+    <h3 class="subhead" id="references">References &amp; credits</h3>
+    <ol class="refs">
+      <li>P. Fankhauser, M. Bloesch, C. Gehring, M. Hutter, and R. Siegwart, “Robot-centric elevation mapping with uncertainty estimates,” <i>CLAWAR</i>, 2014.</li>
+      <li>P. Fankhauser, M. Bloesch, and M. Hutter, “Probabilistic terrain mapping for mobile robots with uncertain localization,” <i>IEEE RA-L</i>, 3(4):3019–3026, 2018.</li>
+      <li>A. Hornung, K. M. Wurm, M. Bennewitz, C. Stachniss, and W. Burgard, “OctoMap: An efficient probabilistic 3D mapping framework based on octrees,” <i>Autonomous Robots</i>, 34:189–206, 2013.</li>
+      <li>G. Erni, J. Frey, T. Miki, M. Mattamala, and M. Hutter, “MEM: Multi-modal elevation mapping for robotics and learning,” <i>IEEE/RSJ IROS</i>, 2023.</li>
+      <li>S. Macenski, T. Foote, B. Gerkey, C. Lalancette, and W. Woodall, “Robot Operating System 2: Design, architecture, and uses in the wild,” <i>Science Robotics</i>, 7(66), 2022.</li>
+    </ol>
+    <p class="note"><b>Hardware credits.</b> Husky, Jackal, Warthog: Clearpath Robotics. R-Gator: Deere &amp; Company (John Deere). OS1-128, OS2-64 LiDAR: Ouster. VLP-16 LiDAR: Velodyne Lidar. RealSense D435i: Intel. Product names and trademarks belong to their respective owners.</p>
+  </section>
+
+  <footer class="site-foot">
+    <p class="mono dim">© 2024–2026 Weihao Cheng. All rights reserved: text, figures, data and code on this site may not be reused without permission.</p>
+    <p class="mono dim">Interactive demos render the original research data in your browser with three.js. Hardware shown is made by
+      John Deere (R-Gator), Clearpath Robotics (Husky, Jackal, Warthog), Ouster and Velodyne (LiDAR), Carnegie Robotics and Intel (cameras);
+      trademarks belong to their owners.</p>
+  </footer>
+
+  <div class="lightbox" id="lightbox" hidden><img alt=""><p></p></div>
+  <script type="module" src="assets/js/main.js?v=6"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vision-Based Pothole Detection — Weihao Cheng</title>
+  <meta name="description" content="Custom-trained YOLOv8 segmentation for potholes as a camera-based pilot study for negative-obstacle detection.">
+  <meta property="og:title" content="Vision-Based Pothole Detection — Weihao Cheng">
+  <meta property="og:description" content="Interactive demos of LiDAR negative-obstacle detection, multi-frame ICP, ground segmentation and terrain mapping on off-road UGVs.">
+  <meta property="og:image" content="https://wc466.github.io/assets/img/og.png">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css?v=6">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="index.html">W<span>C</span></a>
+    <nav>
+      <a href="index.html#projects">← Projects</a>
+      <a href="negative-obstacles.html">Negative obstacles</a>
+      <a href="ground-segmentation.html">Ground segmentation</a>
+    </nav>
+  </header>
+
+  <div class="crumb"><a href="index.html#projects">← All projects</a></div>
+  <section class="project">
+    <div class="project-head">
+      <p class="tag mono">vision · deep learning</p>
+      <h2>Vision-based pothole detection with YOLOv8</h2>
+      <p class="summary">Before building the LiDAR detector, I tried cameras. Potholes are the most common negative obstacle, so I trained <b>YOLOv8</b> segmentation models on several pothole datasets, tuning learning rate, epochs and batch size until they reliably detected and outlined both small and large potholes.</p>
+    </div>
+    <div class="status-banner"><span class="wip-badge">Results in progress</span><span>The trained models segment potholes well. A held-out accuracy breakdown (mAP and IoU per dataset) has not been written up yet.</span></div>
+    <div class="figs two">
+      <figure class="fig" data-cap="A small pothole segmented by the custom-trained YOLOv8 model">
+        <img src="assets/img/project/pothole_small.jpg" alt="Small pothole" loading="lazy"><figcaption><b>Small pothole</b>segmented by the custom-trained model</figcaption></figure>
+      <figure class="fig" data-cap="A large pothole segmented by the custom-trained YOLOv8 model">
+        <img src="assets/img/project/pothole_large.jpg" alt="Large pothole" loading="lazy"><figcaption><b>Large pothole</b>segmented by the custom-trained model</figcaption></figure>
+    </div>
+    <h3 class="subhead">Why it led to the LiDAR approach</h3>
+    <p class="subnote">The model is only as general as its training data. Potholes are just one kind of negative obstacle, and
+      labelled datasets of trenches, pits and sinkholes are scarce. A geometric LiDAR method needs no training data and covers
+      any hole shape. That became the <a href="negative-obstacles.html">long-range negative-obstacle detector</a>.</p>
+
+    <h3 class="subhead" id="references">References &amp; credits</h3>
+    <ol class="refs">
+      <li>G. Jocher, A. Chaurasia, and J. Qiu, <i>Ultralytics YOLO</i>, v8.0.0, 2023. <a href="https://github.com/ultralytics/ultralytics">github.com/ultralytics/ultralytics</a>.</li>
+      <li>A. Dhiman and R. Klette, “Pothole detection using computer vision and learning,” <i>IEEE T-ITS</i>, 21(8):3536–3550, 2019.</li>
+      <li>S. Ruan, S. Li, C. Lu, and Q. Gu, “A real-time negative obstacle detection method for autonomous trucks in open-pit mines,” <i>Sustainability</i>, 15(1):120, 2022.</li>
+    </ol>
+  </section>
+
+  <footer class="site-foot">
+    <p class="mono dim">© 2024–2026 Weihao Cheng. All rights reserved: text, figures, data and code on this site may not be reused without permission.</p>
+    <p class="mono dim">Interactive demos render the original research data in your browser with three.js. Hardware shown is made by
+      John Deere (R-Gator), Clearpath Robotics (Husky, Jackal, Warthog), Ouster and Velodyne (LiDAR), Carnegie Robotics and Intel (cameras);
+      trademarks belong to their owners.</p>
+  </footer>
+
+  <div class="lightbox" id="lightbox" hidden><img alt=""><p></p></div>
+  <script type="module" src="assets/js/main.js?v=6"></script>
+</body>
+</html>

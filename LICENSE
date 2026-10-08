@@ -1,0 +1,14 @@
+Copyright (c) 2024-2026 Weihao Cheng. All rights reserved.
+
+The text, figures, point-cloud data, demos and source code in this repository are
+published for viewing only. No license is granted to copy, modify, redistribute or
+use any part of this work, including the negative-obstacle detection method and
+results it describes, without prior written permission from the author.
+
+To reference the negative-obstacle work, please cite:
+  W. Cheng, W. R. Norris, D. S. Nottage, and A. Soylemezoglu, "An Elevation-based Deep
+  Negative Obstacle Detection and Mapping Method for Unmanned Ground Vehicles with LiDAR
+  Point Cloud Data," manuscript, 2024.
+
+Third-party works cited on the site (e.g. Patchwork, Open3D, three.js) remain under
+their own licenses. Product names are trademarks of their respective owners.
