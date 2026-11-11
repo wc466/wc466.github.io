@@ -8,7 +8,8 @@ results it describes, without prior written permission from the author.
 To reference the negative-obstacle work, please cite:
   W. Cheng, W. R. Norris, D. S. Nottage, and A. Soylemezoglu, "An Elevation-based Deep
   Negative Obstacle Detection and Mapping Method for Unmanned Ground Vehicles with LiDAR
-  Point Cloud Data," manuscript, 2024.
+  Point Cloud Data," preprint, Zenodo, 2026. doi: 10.5281/zenodo.24123084
+  (The preprint PDF itself is distributed by Zenodo under the license shown on its record.)
 
 Third-party works cited on the site (e.g. Patchwork, Open3D, three.js) remain under
 their own licenses. Product names are trademarks of their respective owners.
