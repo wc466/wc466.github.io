@@ -109,7 +109,7 @@ class Viewer {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
   }
-  done() { this.el.querySelector('.loading')?.remove(); }
+  done() { this.el.querySelectorAll('.loading').forEach(l => l.remove()); }
 }
 
 function boxLines(xmin, xmax, ymin, ymax, zmin, zmax, color, opacity = 0.9) {
