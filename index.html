@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css?v=10">
+  <link rel="stylesheet" href="assets/css/style.css?v=12">
   <script type="importmap">
   { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
@@ -24,6 +24,7 @@
   <header class="nav">
     <a class="brand" href="index.html">W<span>C</span></a>
     <nav>
+      <a href="assets/Weihao_Cheng_Resume.pdf" target="_blank" rel="noopener">Resume</a>
       <a href="#projects">Projects</a>
       <a href="negative-obstacles.html">Negative obstacles</a>
       <a href="ground-segmentation.html">Ground segmentation</a>
@@ -36,14 +37,16 @@
   <section class="hero" id="top">
     <div class="hero-text">
       <h1>Weihao Cheng</h1>
-      <p class="role">Robotics perception engineer · Embodied AI</p>
+      <p class="role">Robotics perception engineer · Embodied AI · Applied ML · Autonomy · Defense Tech</p>
       <p class="degree">M.S. Mechanical Engineering (Robotics) @ UIUC</p>
       <p class="now"><span class="dot" aria-hidden="true"></span><span>Currently <b>AI Engineer / Scientist</b> at <b>Honeywell Aerospace</b></span></p>
-      <p class="lede">I work on perception and AI for autonomous systems. In my graduate research I built LiDAR perception
-        for off-road vehicles: registering scans, segmenting ground, mapping terrain, and finding the trenches and pits a
-        robot should never drive into.</p>
+      <p class="lede">Perception engineer and applied scientist working on 3D computer vision, multi-sensor fusion,
+        localization, and embodied AI for autonomous systems. I train and evaluate deep learning models on camera,
+        thermal IR, LiDAR, magnetic, and inertial data, with a focus on cross-modal image matching, 3D reconstruction,
+        and quantifying when a perception model can be trusted. Experience on ITAR-controlled government R&amp;D programs.</p>
       <div class="cta">
         <a class="btn primary" href="#projects">See projects ↓</a>
+        <a class="btn" href="assets/Weihao_Cheng_Resume.pdf" target="_blank" rel="noopener">Resume (PDF) ↗</a>
         <a class="btn" href="https://hdl.handle.net/2142/127459" target="_blank" rel="noopener">M.S. thesis ↗</a>
         <a class="btn" href="mailto:wcheng466@gmail.com">Email</a>
         <a class="btn" href="https://www.linkedin.com/" target="_blank" rel="noopener" data-todo="linkedin">LinkedIn</a>
@@ -65,7 +68,8 @@
         <p>Graduate research supported by the US Army Construction Engineering Research Laboratory (CERL):
           ground segmentation, long-range deep negative-obstacle detection, and multi-modal traversability mapping,
           tested on four autonomous platforms. Everything below runs on the data I collected.</p>
-        <p><a class="thesis-link" href="https://hdl.handle.net/2142/127459" target="_blank" rel="noopener">Read the full thesis (PDF, via IDEALS) →</a></p>
+        <p class="about-links"><a class="thesis-link" href="https://hdl.handle.net/2142/127459" target="_blank" rel="noopener">Read the full thesis (PDF, via IDEALS) →</a>
+          <a class="thesis-link" href="https://cacms.grainger.illinois.edu/" target="_blank" rel="noopener">Research group: CACMS at UIUC ↗</a></p>
       </div>
       <div class="facts">
         <div class="fact"><b>8.5 m</b>detection range for a 0.7 m-wide pit (vs ~3 m before)</div>
@@ -130,6 +134,6 @@
   </footer>
 
   <div class="lightbox" id="lightbox" hidden><img alt=""><p></p></div>
-  <script type="module" src="assets/js/main.js?v=9"></script>
+  <script type="module" src="assets/js/main.js?v=10"></script>
 </body>
 </html>

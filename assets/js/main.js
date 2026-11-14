@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 // ---------------------------------------------------------------- personal links
 // Fill these in; buttons with an empty value are hidden.
 const CONFIG = {
-  linkedin: '',            // e.g. 'https://www.linkedin.com/in/your-handle'
+  linkedin: 'https://www.linkedin.com/in/weihao-cheng',            // e.g. 'https://www.linkedin.com/in/your-handle'
 };
 for (const el of document.querySelectorAll('[data-todo]')) {
   const v = CONFIG[el.dataset.todo];
