@@ -37,7 +37,7 @@ Open http://localhost:8000. A local server is needed because the page fetches bi
 ## Personalise
 
 - `assets/js/main.js` → `CONFIG`: add your LinkedIn URL. An empty value hides the button.
-- `index.html`: hero tagline; add a GitHub button to your own profile if you want one.
+- `index.html`: hero text and photo; add a GitHub button to your own profile if you want one.
 
 ## Rebuilding the demo data
 

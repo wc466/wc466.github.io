@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css?v=8">
+  <link rel="stylesheet" href="assets/css/style.css?v=9">
   <script type="importmap">
   { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
@@ -27,39 +27,45 @@
       <a href="#projects">Projects</a>
       <a href="negative-obstacles.html">Negative obstacles</a>
       <a href="ground-segmentation.html">Ground segmentation</a>
+      <a href="https://hdl.handle.net/2142/127459" target="_blank" rel="noopener">Thesis</a>
       <a href="mailto:wcheng466@gmail.com">Contact</a>
     </nav>
   </header>
 
   <!-- ============================================================ HERO -->
   <section class="hero" id="top">
-    <div class="hero-canvas" id="hero-view" aria-hidden="true"></div>
     <div class="hero-text">
-      <p class="eyebrow mono">// perception &amp; mapping for unmanned ground vehicles</p>
       <h1>Weihao Cheng</h1>
-      <p class="role">Robotics perception engineer · Embodied AI · M.S. Mechanical Engineering</p>
-      <p class="now"><span class="dot" aria-hidden="true"></span>Currently <b>AI Engineer / Scientist</b> at <b>Honeywell Aerospace</b></p>
+      <p class="role">Robotics perception engineer · Embodied AI</p>
+      <p class="degree">M.S. Mechanical Engineering (Robotics) @ University of Illinois Urbana-Champaign</p>
+      <p class="now"><span class="dot" aria-hidden="true"></span><span>Currently <b>AI Engineer / Scientist</b> at <b>Honeywell Aerospace</b></span></p>
       <p class="lede">I work on perception and AI for autonomous systems. In my graduate research I built LiDAR perception
         for off-road vehicles: registering scans, segmenting ground, mapping terrain, and finding the trenches and pits a
         robot should never drive into.</p>
       <div class="cta">
         <a class="btn primary" href="#projects">See projects ↓</a>
+        <a class="btn" href="https://hdl.handle.net/2142/127459" target="_blank" rel="noopener">M.S. thesis ↗</a>
         <a class="btn" href="mailto:wcheng466@gmail.com">Email</a>
         <a class="btn" href="https://www.linkedin.com/" target="_blank" rel="noopener" data-todo="linkedin">LinkedIn</a>
       </div>
-      <p class="hint mono">Background: one raw Ouster OS1-128 scan from the R-Gator — drag to orbit.</p>
     </div>
+    <figure class="hero-photo">
+      <img src="assets/img/project/platforms.jpg" width="1400" height="1050"
+        alt="Four autonomous ground robots on a lawn at the University of Illinois: a John Deere R-Gator, a Clearpath Warthog with a robot arm, a Jackal and a Husky">
+      <figcaption class="mono">The fleet I worked on: R-Gator · Warthog · Jackal · Husky</figcaption>
+    </figure>
   </section>
 
   <!-- ============================================================ ABOUT -->
   <section class="about">
     <div class="about-card">
       <div>
-        <p class="tag mono">Graduate research project · 2024</p>
+        <p class="tag mono">M.S. thesis · University of Illinois Urbana-Champaign · 2024</p>
         <h2>Perception and Mapping for Unmanned Ground Vehicles in Unstructured Environments</h2>
         <p>Graduate research supported by the US Army Construction Engineering Research Laboratory (CERL):
           ground segmentation, long-range deep negative-obstacle detection, and multi-modal traversability mapping,
           tested on four autonomous platforms. Everything below runs on the data I collected.</p>
+        <p><a class="thesis-link" href="https://hdl.handle.net/2142/127459" target="_blank" rel="noopener">Read the full thesis (PDF, via IDEALS) →</a></p>
       </div>
       <div class="facts">
         <div class="fact"><b>8.5 m</b>detection range for a 0.7 m-wide pit (vs ~3 m before)</div>
@@ -124,6 +130,6 @@
   </footer>
 
   <div class="lightbox" id="lightbox" hidden><img alt=""><p></p></div>
-  <script type="module" src="assets/js/main.js?v=8"></script>
+  <script type="module" src="assets/js/main.js?v=9"></script>
 </body>
 </html>

@@ -1,9 +1,8 @@
 """Extracts selected figures from the project report PDF into assets/img/project (needs PyMuPDF + Pillow).
-Usage: python tools/build_project_figs.py <report.pdf>
-Location-identifying signage/logos are blurred (REDACT boxes, in output-pixel coordinates)."""
+Usage: python tools/build_project_figs.py <report.pdf>"""
 import io, os
 import fitz
-from PIL import Image, ImageFilter
+from PIL import Image
 
 import sys
 PDF = sys.argv[1]
@@ -19,12 +18,6 @@ PICKS = {
     (62, 0): "elevation_jackal", (63, 0): "voxel_rgator", (64, 0): "multilayer_map", (65, 0): "elevation_husky",
     (59, 0): "costmap_1", (59, 1): "costmap_2", (59, 2): "costmap_3",
 }
-REDACT = {
-    "platforms": [(630, 80, 890, 350),           # building sign with institution name + address
-                  (415, 235, 530, 305)],         # lab lettering on the R-Gator bed
-    "rgator": [(545, 165, 635, 245),             # institution logo + sticker on the sensor housing
-               (990, 490, 1180, 585)],           # lab lettering on the bed
-}
 doc = fitz.open(PDF)
 for (page, k), name in PICKS.items():
     xref = doc[page - 1].get_images(full=True)[k][0]
@@ -33,7 +26,5 @@ for (page, k), name in PICKS.items():
         pix = fitz.Pixmap(fitz.csRGB, pix)
     im = Image.open(io.BytesIO(pix.tobytes("png"))).convert("RGB")
     im.thumbnail((1400, 1100))
-    for box in REDACT.get(name, []):
-        im.paste(im.crop(box).filter(ImageFilter.GaussianBlur(22)), box[:2])
     im.save(os.path.join(DST, name + ".jpg"), quality=84)
     print(name, im.size)
